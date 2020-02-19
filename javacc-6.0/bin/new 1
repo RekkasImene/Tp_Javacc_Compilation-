@@ -1,0 +1,41 @@
+PARSER_BEGIN (TD)
+public class TD {
+ public static void main (string args[] throws ParseException{
+   TD parser = new TD(system.in);
+   parser.E();
+ }
+}
+PARSER_END (TD);
+
+void E ():
+{}
+{
+T()
+EE()
+}
+
+void EE:
+{}
+{"or" T()
+ EE()?
+}
+voif T:
+{}
+{F()
+TT()
+}
+void TT:
+{}
+{"and" F()
+ TT()?
+}
+voif F:
+{}
+{"not" G()
+}
+void G:
+{}
+{"(" E() ")"
+ "id"
+}
+

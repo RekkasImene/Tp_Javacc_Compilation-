@@ -1,0 +1,72 @@
+options {
+  STATIC = false;
+}
+PARSER_BEGIN(SyntaxChecker)
+
+public class SyntaxChecker {
+    public static void main(String[] args) {
+        SyntaxChecker syntaxChecker = new SyntaxChecker(System.in);
+        try {
+            syntaxChecker.S();
+            System.out.println("Syntaxe correcte");
+        } catch (ParseException e) {
+            // Catching Throwable is ugly but JavaCC throws Error objects!
+            System.out.println(" erreur Syntaxique : " + e.getMessage());
+        }
+        catch (TokenMgrError e) {
+                    // Catching Throwable is ugly but JavaCC throws Error objects!
+                    System.out.println(" erreur Lexicale : " + e.getMessage());
+                }
+    }
+}
+
+PARSER_END(SyntaxChecker)
+
+SKIP:  {
+    " "
+    | "\t"
+    | "\n"
+    | "\r\n"
+    }
+
+TOKEN : {
+     <id : ["A"-"B"](<LETTRECHIFFRE>)*>
+     | <OR : "or" >
+     | <AND : "and" >
+     | <NOT : "not" >
+     |<#LETTRECHIFFRE : ["0"-"9","A"-"Z","a"-"z"]>
+    }
+void S() : { }
+    {
+      E() <EOF>
+    }
+/** E → T E'   s'exprime en BNF <E>::<T> <E'>  */
+void E() : { }
+    {
+        T() EPRIM()
+    }
+/** E' → or T E' | ε  <E> :: ("or" <T> <E'>) ?  */
+void EPRIM() : { }
+    {
+        (<OR> T() EPRIM())?
+    }
+/** T → F T' */
+void T() : { }
+    {
+        F() TPRIM()
+    }
+/** TPRIM → and F T' | ε */
+void TPRIM() : { }
+    {
+        (<AND> F() TPRIM())?
+    }
+/** F → NOT G | G */
+void F() : { }
+    {
+        (<NOT>)? G()
+    }
+/** G → ( E ) | id */
+void G() : { }
+    {
+       "(" E() ")" | <id>
+    }

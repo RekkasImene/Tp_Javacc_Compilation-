@@ -1,0 +1,109 @@
+options {
+  STATIC = false;
+  LOOKAHEAD= 3;
+  FORCE_LA_CHECK=true;
+  
+}
+
+PARSER_BEGIN(AnalLL1)
+import java.io.*;
+public class AnalLL1 {
+  public static void main(String[] args) {
+    Reader sr = new StringReader(args[0]);
+    AnalLL1 td3show = new AnalLL1(sr);
+    try {
+      td3show.LL1Axiome();
+    } catch (ParseException pe) {
+      pe.printStackTrace();
+    }
+  }
+}
+PARSER_END(AnalLL1)
+
+SKIP :
+{
+  " "
+| "\t"
+| "\n"
+| "\r"
+}
+
+TOKEN : {
+    <id : ["A"-"Z"](<LETTRECHIFFRE>)+ "_">
+  | <DOLAR  : "+" | "*" | "/">
+  | <EGAL  : "<" | ">" >
+  | <AROBASC  : "(" | ")" >
+  | <ETCOM  : "{" | "}" >
+  | <#LETTRECHIFFRE: ["0"-"9","A"-"Z","a"-"z"]>
+}
+
+
+
+void LL1Axiome() : { } 
+{
+  E() <EOF>
+}
+
+/** E → S | ε   s'exprime en BNF <E>::<S> ?  */
+void E () : {} 
+{
+   (S())?  
+}
+
+/** S → A @ B | B & A   */
+void S() : {}
+{ 
+    A() <AROBASC> B() 
+  | B() <ETCOM> A() 
+}
+
+/** A → B Y| = X */
+void A() :{}
+{
+ B() Y() 
+| <EGAL> X()
+}
+
+/** X → S A’ | A’ */
+void X() : {}
+{ 
+ (S())? Aprim()
+}
+
+/** Y → $ A’ | & A = X */
+void Y():{} 
+{
+   <DOLAR> Aprim() 
+ | <ETCOM> A() <EGAL> X()
+}
+
+/** A’ → @ B = X | ε */
+void  Aprim():{} 
+{ 
+  [(<AROBASC> B() <EGAL> X())] 
+}
+
+/** B → = Z | id T */
+void B() :{} 
+{ 
+    <EGAL> Z() 
+  | <id> T()
+}
+
+/** Z → S A’ id B’ | A’ id B’ */
+void Z():{}
+{
+    (S())? Aprim() <id> Bprim()
+}
+
+/** T → S B’ | B’ */
+void T():{}
+{
+  (S())? Bprim()
+}
+
+/** B’ → $ A’ id B’ | & A = Z | ε */
+void Bprim():{}
+{
+  (<DOLAR> Aprim() <id> Bprim() | <ETCOM> A() <EGAL> Z())?
+}

@@ -1,0 +1,66 @@
+options {
+  STATIC = false;
+}
+PARSER_BEGIN(TRANSB)
+
+public class TRANSB {
+    public static void main(String[] args) {
+        TRANSB transb = new TRANSB(System.in);
+        try {
+            transb.S();
+            System.out.println("Syntaxe correcte");
+        } catch (ParseException e) {
+            // Catching Throwable is ugly but JavaCC throws Error objects!
+            System.out.println(" erreur Syntaxique : " + e.getMessage());
+        }
+        catch (TokenMgrError e) {
+                    // Catching Throwable is ugly but JavaCC throws Error objects!
+                    System.out.println(" erreur Lexicale : " + e.getMessage());
+                }
+    }
+}
+
+PARSER_END(TRANSB)
+
+TOKEN : {
+     <id : ["0"-"9"]>
+     | <@ : "@" >
+     | <\n : "\n" >
+    }
+
+void S() : { }
+    {
+      TD() <EOF>
+    }
+
+void TD() : { }
+    {
+        EL() ?
+    }
+
+void SS() : { }
+    {
+        
+    }
+
+void T() : { }
+    {
+        F() TPRIM()
+    }
+
+void TPRIM() : { }
+    {
+        (<AND> F() TPRIM())?
+    }
+/** F → NOT G | G */
+void F() : { }
+    {
+        (<NOT>)? G()
+    }
+/** G → ( E ) | id */
+void G() : { }
+    {
+       "(" E() ")" | <id>
+    }
+
+
